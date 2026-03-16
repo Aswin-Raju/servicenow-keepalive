@@ -1,0 +1,14 @@
+name: Keep ServiceNow Instance Awake
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ping ServiceNow instance
+        run: curl -s https://dev196745.service-now.com/api/now/table/sys_user?sysparm_limit=1
