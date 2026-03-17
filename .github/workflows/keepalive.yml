@@ -2,7 +2,7 @@ name: Keep ServiceNow Instance Awake
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "0 */3 * * *"
   workflow_dispatch:
 
 jobs:
@@ -11,4 +11,4 @@ jobs:
 
     steps:
       - name: Ping ServiceNow instance
-        run: curl -s https://dev196745.service-now.com/api/now/table/sys_user?sysparm_limit=1
+        run: curl -s https://dev225142.service-now.com/api/now/table/sys_user?sysparm_limit=1
