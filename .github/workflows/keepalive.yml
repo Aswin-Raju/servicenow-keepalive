@@ -10,5 +10,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Ping ServiceNow instance
-        run: curl -s https://dev225142.service-now.com/api/now/table/sys_user?sysparm_limit=1
+      - name: Wake ServiceNow instance (with retry)
+        run: |
+          for i in {1..5}; do
+            echo "Attempt $i..."
+
+            response=$(curl -s -u ${{ secrets.SNOW_USERNAME }}:${{ secrets.SNOW_PASSWORD }} \
+              "https://dev225142.service-now.com/api/now/table/sys_user?sysparm_limit=1")
+
+            echo "$response"
+
+            # Check if instance is still hibernating
+            if echo "$response" | grep -iq "hibernating"; then
+              echo "Instance is hibernating. Retrying in 30 seconds..."
+              sleep 30
+            else
+              echo "Instance is awake!"
+              break
+            fi
+          done
