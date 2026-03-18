@@ -12,18 +12,24 @@ jobs:
     steps:
       - name: Wake ServiceNow instance (with retry)
         run: |
-          for i in {1..5}; do
+          for i in {1..10}; do
             echo "Attempt $i..."
 
+            # Step 1: Hit homepage (this triggers wake-up)
+            curl -s https://dev225142.service-now.com > /dev/null
+
+            # Step 2: Call API with authentication
             response=$(curl -s -u ${{ secrets.SNOW_USERNAME }}:${{ secrets.SNOW_PASSWORD }} \
               "https://dev225142.service-now.com/api/now/table/sys_user?sysparm_limit=1")
 
-            echo "$response"
+            # Optional: print short response status
+            echo "$response" | head -c 200
+            echo ""
 
-            # Check if instance is still hibernating
+            # Step 3: Check if still hibernating
             if echo "$response" | grep -iq "hibernating"; then
-              echo "Instance is hibernating. Retrying in 30 seconds..."
-              sleep 30
+              echo "Instance is still hibernating... waiting 60 seconds"
+              sleep 60
             else
               echo "Instance is awake!"
               break
